@@ -1,640 +1,338 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Days — Coming Soon</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --font-rounded: 'SF Pro Rounded', 'Avenir Next Rounded', 'Helvetica Rounded', 'Nunito', ui-rounded, -apple-system, 'Helvetica Neue', Arial, sans-serif;
-    }
-
-    h1, h2, .page-title, .logo-text, .cs-badge, .page-eyebrow, .btn-white, .job-card h3, .card h3, .about-section h3 {
-      font-family: var(--font-rounded);
-    }
-
-    :root {
-      --blue1: #4A90E2;
-      --blue2: #2E5BBA;
-      --blue3: #1E3A8A;
-      --text: #ffffff;
-      --muted: rgba(255,255,255,0.6);
-      --border: rgba(255,255,255,0.15);
-      --surface: rgba(255,255,255,0.08);
-      --surface-hover: rgba(255,255,255,0.13);
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      min-height: 100vh;
-      background: radial-gradient(ellipse at 65% 25%, var(--blue1) 0%, var(--blue2) 45%, var(--blue3) 100%);
-      color: var(--text);
-      font-family: -apple-system, 'SF Pro Rounded', 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
-
-    /* ── NAV ── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1.1rem 1.75rem;
-      background: transparent;
-      border-bottom: none;
-    }
-
-    .logo {
-      display: flex; align-items: center; gap: 0.6rem;
-      text-decoration: none; cursor: pointer; border: none; background: none;
-    }
-    .logo-img { height: 34px; width: 34px; border-radius: 8px; object-fit: cover; }
-    .logo-text { font-size: 1.3rem; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
-
-    .hamburger {
-      display: flex; flex-direction: column; gap: 5px;
-      cursor: pointer; background: none; border: none; padding: 6px; z-index: 300;
-    }
-    .hamburger span {
-      display: block; width: 22px; height: 1.5px;
-      background: var(--text); border-radius: 2px;
-      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-    }
-    .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
-    .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-    .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
-
-    .drawer-overlay {
-      position: fixed; inset: 0; z-index: 150;
-      background: rgba(10, 25, 70, 0.5);
-      backdrop-filter: blur(4px);
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.3s;
-    }
-    .drawer-overlay.open { opacity: 1; pointer-events: all; }
-
-    .drawer {
-      position: fixed; top: 0; right: -300px; bottom: 0;
-      width: 260px; z-index: 160;
-      background: rgba(18, 42, 115, 0.97);
-      backdrop-filter: blur(30px);
-      border-left: 1px solid var(--border);
-      display: flex; flex-direction: column;
-      padding: 5rem 1.5rem 2rem;
-      transition: right 0.35s cubic-bezier(0.4,0,0.2,1);
-      gap: 0.15rem;
-    }
-    .drawer.open { right: 0; }
-    .drawer a {
-      color: var(--text); text-decoration: none;
-      font-size: 1.05rem; font-weight: 400;
-      padding: 0.8rem 1rem; border-radius: 12px;
-      transition: background 0.2s; display: block;
-    }
-    .drawer a:hover { background: var(--surface-hover); }
-    .drawer-divider { border: none; border-top: 1px solid var(--border); margin: 0.6rem 0; }
-
-    /* ── PAGES ── */
-    .page { display: none; min-height: 100vh; position: relative; z-index: 1; }
-    .page.active { display: block; }
-
-    /* ── HOME ── */
-    #home {
-      display: none;
-      flex-direction: column; align-items: center; justify-content: center;
-      min-height: 100vh; text-align: center;
-      padding: 6rem 2rem 4rem;
-    }
-    #home.active { display: flex; }
-
-    .cs-badge {
-      display: inline-block;
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.25);
-      border-radius: 100px; padding: 0.38rem 1rem;
-      font-size: 0.7rem; letter-spacing: 0.15em;
-      text-transform: uppercase; font-weight: 500;
-      margin-bottom: 1.75rem;
-      animation: fadeUp 0.6s ease both;
-    }
-
-    .hero-logo-wrap {
-      width: 88px; height: 88px; border-radius: 22px;
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.25);
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 1.75rem; overflow: hidden;
-      animation: fadeUp 0.6s 0.05s ease both;
-    }
-    .hero-logo-wrap img { width: 100%; height: 100%; object-fit: cover; }
-    .hero-logo-placeholder { font-size: 2.2rem; }
-
-    h1 {
-      font-size: clamp(2.6rem, 8vw, 5rem);
-      font-weight: 300; line-height: 1.1;
-      letter-spacing: -0.03em; margin-bottom: 1.1rem;
-      animation: fadeUp 0.6s 0.1s ease both;
-    }
-    h1 strong { font-weight: 600; }
-
-    .hero-sub {
-      font-size: 1rem; color: var(--muted);
-      max-width: 400px; line-height: 1.75;
-      margin: 0 auto 2.25rem;
-      animation: fadeUp 0.6s 0.18s ease both;
-    }
-
-    .notify-form {
-      display: flex; gap: 0.65rem; flex-wrap: wrap;
-      justify-content: center; margin-bottom: 0.85rem;
-      animation: fadeUp 0.6s 0.25s ease both;
-    }
-    .notify-input {
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.25);
-      border-radius: 12px; padding: 0.75rem 1.1rem;
-      color: var(--text); font-size: 0.9rem;
-      font-family: inherit; outline: none; width: 230px;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .notify-input::placeholder { color: rgba(255,255,255,0.4); }
-    .notify-input:focus { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.18); }
-
-    .btn-white {
-      background: #fff; color: var(--blue3);
-      border: none; border-radius: 12px;
-      padding: 0.75rem 1.4rem; font-size: 0.9rem;
-      font-weight: 600; font-family: inherit;
-      cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; white-space: nowrap;
-    }
-    .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.2); }
-
-    .cs-note { font-size: 0.76rem; color: var(--muted); animation: fadeUp 0.6s 0.3s ease both; }
-
-    /* ── INNER PAGES ── */
-    .inner-wrap { max-width: 820px; margin: 0 auto; padding: 7rem 2rem 5rem; }
-    .page-eyebrow {
-      font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase;
-      color: rgba(255,255,255,0.45); font-weight: 500; margin-bottom: 0.9rem;
-    }
-    .page-title {
-      font-size: clamp(2rem, 5.5vw, 3.5rem);
-      font-weight: 300; letter-spacing: -0.025em;
-      line-height: 1.1; margin-bottom: 0.9rem;
-    }
-    .page-title strong { font-weight: 600; }
-    .page-lead { font-size: 0.975rem; color: var(--muted); max-width: 500px; line-height: 1.75; margin-bottom: 2.5rem; }
-    .rule { border: none; border-top: 1px solid var(--border); margin: 0 0 2.25rem; }
-
-    .card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; padding: 1.6rem 1.75rem;
-      transition: background 0.2s, transform 0.2s; margin-bottom: 1rem;
-    }
-    .card:hover { background: var(--surface-hover); transform: translateY(-2px); }
-    .card h3 { font-size: 0.975rem; font-weight: 600; margin-bottom: 0.4rem; }
-    .card p { font-size: 0.86rem; color: var(--muted); line-height: 1.65; }
-
-    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
-    .feature-icon { font-size: 1.5rem; margin-bottom: 0.7rem; }
-
-    .about-section { margin-bottom: 2rem; }
-    .about-section h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.55rem; }
-    .about-section p { color: var(--muted); line-height: 1.8; font-size: 0.9rem; }
-
-    /* Jobs */
-    .job-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 18px; padding: 2rem; margin-bottom: 1.25rem;
-      transition: background 0.2s;
-    }
-    .job-card:hover { background: var(--surface-hover); }
-    .job-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem; }
-    .job-title-wrap h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.35rem; }
-    .job-meta { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.25rem; }
-    .job-tag {
-      font-size: 0.7rem; padding: 0.25rem 0.7rem; border-radius: 100px;
-      border: 1px solid var(--border); color: rgba(255,255,255,0.65);
-      background: rgba(255,255,255,0.05);
-    }
-    .job-comp {
-      font-size: 0.82rem; font-weight: 600; color: #fff;
-      background: rgba(255,255,255,0.12); border: 1px solid var(--border);
-      border-radius: 10px; padding: 0.4rem 0.85rem; white-space: nowrap; align-self: flex-start;
-    }
-    .job-section { margin-bottom: 1.1rem; }
-    .job-section h4 {
-      font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
-      color: rgba(255,255,255,0.45); font-weight: 500; margin-bottom: 0.5rem;
-    }
-    .job-section p, .job-section li { font-size: 0.875rem; color: var(--muted); line-height: 1.7; }
-    .job-section ul { padding-left: 1.2rem; }
-    .job-section ul li { margin-bottom: 0.3rem; }
-    .job-apply {
-      margin-top: 1.25rem; padding-top: 1.25rem;
-      border-top: 1px solid var(--border);
-      font-size: 0.875rem; color: var(--muted); line-height: 1.7;
-    }
-    .job-apply strong { color: var(--text); }
-    .job-apply a { color: #fff; }
-
-    /* Contact */
-    .contact-label { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.4); font-weight: 500; margin-bottom: 0.3rem; }
-    .contact-value { font-size: 0.975rem; }
-    .contact-value a { color: var(--text); text-decoration: none; }
-    .contact-value a:hover { text-decoration: underline; }
-
-    /* Privacy */
-    .prose h3 { font-size: 1.05rem; font-weight: 600; margin: 1.75rem 0 0.5rem; }
-    .prose p, .prose li { font-size: 0.875rem; color: var(--muted); line-height: 1.85; margin-bottom: 0.55rem; }
-    .prose ul { padding-left: 1.4rem; }
-    .prose strong { color: var(--text); }
-    .prose a { color: #fff; }
-
-    /* Footer */
-    footer { border-top: 1px solid var(--border); padding: 1.75rem 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
-    footer p { font-size: 0.76rem; color: var(--muted); }
-    .footer-links { display: flex; gap: 1.25rem; }
-    .footer-links a { font-size: 0.76rem; color: var(--muted); text-decoration: none; transition: color 0.2s; }
-    .footer-links a:hover { color: var(--text); }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @media (max-width: 600px) {
-      nav { padding: 1rem 1.25rem; }
-      .notify-input { width: 100%; }
-      .inner-wrap { padding: 6rem 1.25rem 4rem; }
-      .job-header { flex-direction: column; }
-      footer { padding: 1.5rem 1.25rem; }
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Days — Coming Soon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--b1:#4A90E2;--b2:#2E5BBA;--b3:#1E3A8A;--tx:#fff;--mu:rgba(255,255,255,.6);--br:rgba(255,255,255,.15);--sf:rgba(255,255,255,.08);--sh:rgba(255,255,255,.13);--fn:-apple-system,'SF Pro Rounded','Avenir Next Rounded','Helvetica Rounded','Nunito',ui-rounded,'Helvetica Neue',Arial,sans-serif}
+html{scroll-behavior:smooth}
+body{min-height:100vh;background:radial-gradient(ellipse at 65% 25%,var(--b1) 0%,var(--b2) 45%,var(--b3) 100%);color:var(--tx);font-family:var(--fn);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.75rem;background:transparent}
+.logo{display:flex;align-items:center;gap:.6rem;cursor:pointer;border:none;background:none;color:#fff;font-family:var(--fn);font-size:1.3rem;font-weight:700}
+.hb{display:flex;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:6px;z-index:300}
+.hb span{display:block;width:22px;height:1.5px;background:#fff;border-radius:2px;transition:all .3s}
+.hb.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.hb.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.hb.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+.ov{position:fixed;inset:0;z-index:150;background:rgba(10,25,70,.5);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s}
+.ov.open{opacity:1;pointer-events:all}
+.dr{position:fixed;top:0;right:-300px;bottom:0;width:260px;z-index:160;background:rgba(18,42,115,.97);backdrop-filter:blur(30px);border-left:1px solid var(--br);display:flex;flex-direction:column;padding:5rem 1.5rem 2rem;transition:right .35s cubic-bezier(.4,0,.2,1);gap:.15rem}
+.dr.open{right:0}
+.dr a{color:#fff;text-decoration:none;font-size:1.05rem;font-weight:400;padding:.8rem 1rem;border-radius:12px;transition:background .2s;display:block;font-family:var(--fn)}
+.dr a:hover{background:var(--sh)}
+.dr hr{border:none;border-top:1px solid var(--br);margin:.6rem 0}
+.pg{display:none;min-height:100vh;position:relative;z-index:1}
+.pg.on{display:block}
+#home{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:6rem 2rem 4rem}
+#home.on{display:flex}
+.badge{display:inline-block;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:100px;padding:.38rem 1rem;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;font-weight:600;margin-bottom:1.75rem;font-family:var(--fn)}
+.icon{width:88px;height:88px;border-radius:22px;border:1px solid rgba(255,255,255,.25);margin:0 auto 1.75rem;overflow:hidden}
+.icon img{width:100%;height:100%;object-fit:cover}
+h1{font-size:clamp(2.6rem,8vw,5rem);font-weight:900;line-height:1.1;letter-spacing:-.03em;margin-bottom:1.1rem;font-family:var(--fn)}
+.sub{font-size:1rem;color:var(--mu);max-width:540px;line-height:1.75;margin:0 auto 2.25rem}
+.nf{display:flex;gap:.65rem;flex-wrap:wrap;justify-content:center;margin-bottom:.85rem}
+.ni{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:.75rem 1.1rem;color:#fff;font-size:.9rem;font-family:var(--fn);outline:none;width:230px;transition:border-color .2s,background .2s}
+.ni::placeholder{color:rgba(255,255,255,.4)}
+.ni:focus{border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.18)}
+.nb{background:#fff;color:var(--b3);border:none;border-radius:12px;padding:.75rem 1.4rem;font-size:.9rem;font-weight:700;font-family:var(--fn);cursor:pointer;transition:transform .2s,box-shadow .2s;white-space:nowrap}
+.nb:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.2)}
+.note{font-size:.76rem;color:var(--mu)}
+.iw{max-width:820px;margin:0 auto;padding:7rem 2rem 5rem}
+.ey{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.45);font-weight:600;margin-bottom:.9rem;font-family:var(--fn)}
+.pt{font-size:clamp(2rem,5.5vw,3.5rem);font-weight:300;letter-spacing:-.025em;line-height:1.1;margin-bottom:.9rem;font-family:var(--fn)}
+.pt strong{font-weight:700}
+.pl{font-size:.975rem;color:var(--mu);max-width:500px;line-height:1.75;margin-bottom:2.5rem}
+.rl{border:none;border-top:1px solid var(--br);margin:0 0 2.25rem}
+.cd{background:var(--sf);border:1px solid var(--br);border-radius:16px;padding:1.6rem 1.75rem;transition:background .2s,transform .2s;margin-bottom:1rem}
+.cd:hover{background:var(--sh);transform:translateY(-2px)}
+.cd h3{font-size:.975rem;font-weight:700;margin-bottom:.4rem;font-family:var(--fn)}
+.cd p{font-size:.86rem;color:var(--mu);line-height:1.65}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem}
+.fi{font-size:1.5rem;margin-bottom:.7rem}
+.ab{margin-bottom:2rem}
+.ab h3{font-size:1.1rem;font-weight:700;margin-bottom:.55rem;font-family:var(--fn)}
+.ab p{color:var(--mu);line-height:1.8;font-size:.9rem}
+.jc{background:var(--sf);border:1px solid var(--br);border-radius:18px;padding:2rem;margin-bottom:1.25rem;transition:background .2s}
+.jc:hover{background:var(--sh)}
+.jh{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.25rem}
+.jh h3{font-size:1.1rem;font-weight:700;margin-bottom:.35rem;font-family:var(--fn)}
+.jm{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.25rem}
+.jt{font-size:.7rem;padding:.25rem .7rem;border-radius:100px;border:1px solid var(--br);color:rgba(255,255,255,.65);background:rgba(255,255,255,.05)}
+.jp{font-size:.82rem;font-weight:700;color:#fff;background:rgba(255,255,255,.12);border:1px solid var(--br);border-radius:10px;padding:.4rem .85rem;white-space:nowrap;align-self:flex-start;font-family:var(--fn)}
+.js{margin-bottom:1.1rem}
+.js h4{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.45);font-weight:600;margin-bottom:.5rem;font-family:var(--fn)}
+.js p,.js li{font-size:.875rem;color:var(--mu);line-height:1.7}
+.js ul{padding-left:1.2rem}
+.js li{margin-bottom:.3rem}
+.ja{margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--br);font-size:.875rem;color:var(--mu);line-height:1.7}
+.ja strong{color:#fff}
+.ja a{color:#fff}
+.cl{font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.4);font-weight:600;margin-bottom:.3rem;font-family:var(--fn)}
+.cv{font-size:.975rem}
+.cv a{color:#fff;text-decoration:none}
+.cv a:hover{text-decoration:underline}
+.pr h3{font-size:1.05rem;font-weight:700;margin:1.75rem 0 .5rem;font-family:var(--fn)}
+.pr p,.pr li{font-size:.875rem;color:var(--mu);line-height:1.85;margin-bottom:.55rem}
+.pr ul{padding-left:1.4rem}
+.pr strong{color:#fff}
+.pr a{color:#fff}
+footer{border-top:1px solid var(--br);padding:1.75rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+footer p{font-size:.76rem;color:var(--mu)}
+.fl{display:flex;gap:1.25rem}
+.fl a{font-size:.76rem;color:var(--mu);text-decoration:none;transition:color .2s}
+.fl a:hover{color:#fff}
+@media(max-width:600px){nav{padding:1rem 1.25rem}.ni{width:100%}.iw{padding:6rem 1.25rem 4rem}.jh{flex-direction:column}footer{padding:1.5rem 1.25rem}}
+</style>
 </head>
 <body>
 
 <nav>
-  <button class="logo" onclick="SD('home')">
-    <img class="logo-img" src="logo.svg" alt="Days" style="height:32px;width:auto;">
-  </button>
-  <button class="hamburger" id="hamburger" aria-label="Open menu" onclick="TG()">
-    <span></span><span></span><span></span>
-  </button>
+  <button class="logo" onclick="go('home')">Days</button>
+  <button class="hb" id="HB" onclick="tog()"><span></span><span></span><span></span></button>
 </nav>
 
-<div class="drawer-overlay" id="overlay" onclick="CL()"></div>
-<div class="drawer" id="drawer">
-  <a href="#" onclick="SD('home'); closeDrawer()">Home</a>
-  <a href="#" onclick="SD('features'); closeDrawer()">Features</a>
-  <a href="#" onclick="SD('about'); closeDrawer()">About</a>
-  <a href="#" onclick="SD('jobs'); closeDrawer()">Jobs</a>
-  <a href="#" onclick="SD('contact'); closeDrawer()">Contact</a>
-  <hr class="drawer-divider">
-  <a href="#" onclick="SD('terms'); closeDrawer()">Terms of Service</a>
-  <a href="#" onclick="SD('privacy'); closeDrawer()">Privacy Policy</a>
+<div class="ov" id="OV" onclick="cls()"></div>
+<div class="dr" id="DR">
+  <a href="#" onclick="go('home');cls();return false">Home</a>
+  <a href="#" onclick="go('features');cls();return false">Features</a>
+  <a href="#" onclick="go('about');cls();return false">About</a>
+  <a href="#" onclick="go('jobs');cls();return false">Jobs</a>
+  <a href="#" onclick="go('contact');cls();return false">Contact</a>
+  <hr>
+  <a href="#" onclick="go('terms');cls();return false">Terms of Service</a>
+  <a href="#" onclick="go('privacy');cls();return false">Privacy Policy</a>
 </div>
 
-<!-- ══ HOME ══ -->
-<section id="home" class="page active">
-  <div class="cs-badge">Coming Soon</div>
-  <div class="hero-logo-wrap">
-    <img src="icon.png" alt="Days app icon" style="width:88px;height:88px;object-fit:cover;border-radius:22px;border:1px solid rgba(255,255,255,0.25);box-sizing:border-box;">
+<section id="home" class="pg on">
+  <div class="badge">Coming Soon</div>
+  <div class="icon"><img src="icon.png" alt="Days"></div>
+  <h1>Days is coming.</h1>
+  <p class="sub">This is not a drill. A new self-care experience is headed straight to your phone — pre-register for Days today.</p>
+  <div class="nf">
+    <input class="ni" type="email" placeholder="your@email.com" id="EI">
+    <button class="nb" onclick="notify()">Notify Me</button>
   </div>
-  <h1 style="font-weight:900;">Days is coming.</h1>
-  <p class="hero-sub" style="max-width:540px;">This is not a drill. A new self-care experience is headed straight to your phone — pre-register for Days today.</p>
-  <div class="notify-form">
-    <input class="notify-input" type="email" placeholder="your@email.com" id="emailInput">
-    <button class="btn-white" onclick="handleNotify()">Notify Me</button>
-  </div>
-  <p class="cs-note" id="notifyMsg">Pre-register and unlock exclusive rewards on launch.</p>
+  <p class="note" id="NM">Pre-register and unlock exclusive rewards on launch.</p>
 </section>
 
-<!-- ══ FEATURES ══ -->
-<section id="features" class="page">
-  <div class="inner-wrap">
-    <p class="page-eyebrow">What we're building</p>
-    <h2 class="page-title">Designed to help<br><strong>you feel better.</strong></h2>
-    <p class="page-lead">Days is built around the belief that healing should feel simple, not overwhelming. Every feature has a purpose.</p>
-    <hr class="rule">
-    <div class="grid-2">
-      <div class="card"><div class="feature-icon">🌙</div><h3>Daily Reflections</h3><p>A gentle daily prompt to check in with yourself. No pressure — just presence and a moment to breathe.</p></div>
-      <div class="card"><div class="feature-icon">📈</div><h3>Progress Tracking</h3><p>Visualize your journey over time with calm, beautiful charts and meaningful milestones.</p></div>
-      <div class="card"><div class="feature-icon">🔒</div><h3>Private by Design</h3><p>Your data stays yours. We never sell your information or show you ads. Privacy is the foundation.</p></div>
-      <div class="card"><div class="feature-icon">📺</div><h3>Apple TV Experience</h3><p>Designed for the big screen. An immersive, cinematic environment built for real reflection.</p></div>
-      <div class="card"><div class="feature-icon">✨</div><h3>Mindful Design</h3><p>Every detail is crafted to reduce friction and create calm. No noise, no distractions, no dark patterns.</p></div>
-      <div class="card"><div class="feature-icon">🔔</div><h3>Gentle Reminders</h3><p>Optional nudges to help you build a consistent, healthy habit — on your schedule, not ours.</p></div>
+<section id="features" class="pg">
+  <div class="iw">
+    <p class="ey">What we're building</p>
+    <h2 class="pt">Designed to help<br><strong>you feel better.</strong></h2>
+    <p class="pl">Days is built around the belief that healing should feel simple, not overwhelming.</p>
+    <hr class="rl">
+    <div class="g2">
+      <div class="cd"><div class="fi">🌙</div><h3>Daily Reflections</h3><p>A gentle daily prompt to check in with yourself. No pressure — just presence.</p></div>
+      <div class="cd"><div class="fi">📈</div><h3>Progress Tracking</h3><p>Visualize your journey over time with calm, beautiful charts and milestones.</p></div>
+      <div class="cd"><div class="fi">🔒</div><h3>Private by Design</h3><p>Your data stays yours. We never sell your information or show you ads.</p></div>
+      <div class="cd"><div class="fi">📺</div><h3>Apple TV Experience</h3><p>Designed for the big screen. A cinematic environment built for real reflection.</p></div>
+      <div class="cd"><div class="fi">✨</div><h3>Mindful Design</h3><p>Every detail crafted to reduce friction and create calm. No noise, no dark patterns.</p></div>
+      <div class="cd"><div class="fi">🔔</div><h3>Gentle Reminders</h3><p>Optional nudges to help you build a consistent, healthy habit on your schedule.</p></div>
     </div>
   </div>
-  <footer><p>© 2026 Days LLC. All rights reserved.</p><div class="footer-links"><a href="#" onclick="SD('privacy')">Privacy Policy</a><a href="#" onclick="SD('contact')">Contact</a></div></footer>
+  <footer><p>© 2026 Days LLC. All rights reserved.</p><div class="fl"><a href="#" onclick="go('privacy');return false">Privacy Policy</a><a href="#" onclick="go('contact');return false">Contact</a></div></footer>
 </section>
 
-<!-- ══ ABOUT ══ -->
-<section id="about" class="page">
-  <div class="inner-wrap">
-    <p class="page-eyebrow">Who we are</p>
-    <h2 class="page-title">Built with<br><strong>intention.</strong></h2>
-    <p class="page-lead">Days LLC is a small, focused team building tools that help people live well — without the noise that usually comes with wellness apps.</p>
-    <hr class="rule">
-    <div class="about-section"><h3>Our Mission</h3><p>Days was born from a simple idea: healing shouldn't require a therapist's waiting room or a bloated app. We believe small, consistent moments of reflection can change the trajectory of a life. Days is our attempt to make that accessible to everyone — every day.</p></div>
-    <div class="about-section"><h3>Why We Built This</h3><p>We've all had days where we felt lost, stuck, or disconnected. Days is the tool we wished existed — calm, private, and focused purely on helping you feel a little better than you did yesterday. No social feeds, no comparisons, no noise.</p></div>
-    <div class="about-section"><h3>How We Operate</h3><p>We're early-stage and building steadily. Our goal is clarity, not chaos — simplicity, not speed for its own sake. We design with intention and operate with zero interest in surveillance capitalism or bloated bureaucracy.</p></div>
-    <div class="about-section"><h3>Where We're Going</h3><p>Days will continue to evolve based on feedback from our community. If you have thoughts, we genuinely want to hear them. Reach out anytime — we read everything.</p></div>
+<section id="about" class="pg">
+  <div class="iw">
+    <p class="ey">Who we are</p>
+    <h2 class="pt">Built with<br><strong>intention.</strong></h2>
+    <p class="pl">Days LLC is a small, focused team building tools that help people live well.</p>
+    <hr class="rl">
+    <div class="ab"><h3>Our Mission</h3><p>Days was born from a simple idea: healing shouldn't require a therapist's waiting room or a bloated app. Small, consistent moments of reflection can change the trajectory of a life.</p></div>
+    <div class="ab"><h3>Why We Built This</h3><p>We've all had days where we felt lost, stuck, or disconnected. Days is the tool we wished existed — calm, private, and focused purely on helping you feel a little better than yesterday.</p></div>
+    <div class="ab"><h3>How We Operate</h3><p>Early-stage and building steadily. Our goal is clarity, not chaos — simplicity, not speed for its own sake. Zero interest in surveillance capitalism or bloated bureaucracy.</p></div>
+    <div class="ab"><h3>Where We're Going</h3><p>Days will continue to evolve based on community feedback. If you have thoughts, we genuinely want to hear them. Reach out anytime — we read everything.</p></div>
   </div>
-  <footer><p>© 2026 Days LLC. All rights reserved.</p><div class="footer-links"><a href="#" onclick="SD('privacy')">Privacy Policy</a><a href="#" onclick="SD('contact')">Contact</a></div></footer>
+  <footer><p>© 2026 Days LLC. All rights reserved.</p><div class="fl"><a href="#" onclick="go('privacy');return false">Privacy Policy</a><a href="#" onclick="go('contact');return false">Contact</a></div></footer>
 </section>
 
-<!-- ══ JOBS ══ -->
-<section id="jobs" class="page">
-  <div class="inner-wrap">
-    <p class="page-eyebrow">Careers at Days</p>
-    <h2 class="page-title">Join the<br><strong>team.</strong></h2>
-    <p class="page-lead">We're a small crew building something meaningful. We care about doing the real work — not just talking about it.</p>
-    <hr class="rule">
+<section id="jobs" class="pg">
+  <div class="iw">
+    <p class="ey">Careers at Days</p>
+    <h2 class="pt">Join the<br><strong>team.</strong></h2>
+    <p class="pl">We're a small crew building something meaningful. We care about doing the real work.</p>
+    <hr class="rl">
 
-    <!-- OPERATIONS MANAGER -->
-    <div class="job-card">
-      <div class="job-header">
-        <div class="job-title-wrap">
-          <h3>Operations Manager</h3>
-          <div class="job-meta"><span class="job-tag">Hybrid</span><span class="job-tag">Full-Time</span><span class="job-tag">Albuquerque, NM</span></div>
-        </div>
-        <span class="job-comp">Competitive</span>
+    <div class="jc">
+      <div class="jh">
+        <div><h3>Operations Manager</h3><div class="jm"><span class="jt">Hybrid</span><span class="jt">Full-Time</span><span class="jt">Albuquerque, NM</span></div></div>
+        <span class="jp">Competitive</span>
       </div>
-      <div class="job-section"><h4>About Days</h4><p>Days is a focused, quiet app for people who want to live well. We design with intention, operate privately, and build for people — not clicks. We're early-stage and building steadily, and we're looking for someone who can help us scale smart.</p></div>
-      <div class="job-section"><h4>The Role</h4><p>We're looking for an Operations Manager who can proactively build the legal, financial, and administrative infrastructure that lets a small company move fast without breaking things. You'll be our first operational hire — meaning your decisions will shape how Days runs for years to come.</p></div>
-      <div class="job-section"><h4>What You'll Do</h4>
-        <ul>
-          <li><strong>Risk Auditing:</strong> Proactively review the product, policies, and user flows for potential liabilities — especially around App Store compliance and user data collection.</li>
-          <li><strong>Legal Templates:</strong> Draft and maintain boilerplate documents — Terms of Service, Privacy Policy (GDPR/CCPA-compliant), NDAs, consulting agreements, and employment offer letters.</li>
-          <li><strong>IP Strategy:</strong> Lead trademark and copyright efforts for the Days brand. Evaluate open-source licenses and identify IP risks.</li>
-          <li><strong>Due Diligence:</strong> Build and maintain an investor-ready legal folder — cap table, formation docs, operating agreement, contractor contracts.</li>
-          <li><strong>Contracts:</strong> Draft licensing, affiliate, and revenue share agreements for future growth scenarios.</li>
-          <li><strong>Internal Policies:</strong> Create and enforce data security, remote work, reimbursement, and travel policies.</li>
-          <li><strong>Regulatory Monitoring:</strong> Track relevant legal shifts — AI/data law, App Store regulations, digital goods tax compliance — and brief the team.</li>
-          <li><strong>Customer Service Playbook:</strong> Define how we handle disputes, chargebacks, and takedown requests. Build a legal escalation flow.</li>
-          <li><strong>Contractor Compliance:</strong> Ensure correct 1099 classification, international freelancer compliance, and SOW documentation for all contributors.</li>
-          <li><strong>Sales & Accounting:</strong> Support revenue tracking, invoicing, and financial reporting as we scale.</li>
-          <li><strong>Pre-Mortem:</strong> Periodically game out "what legal mistake kills us?" and build guardrails around those scenarios.</li>
-        </ul>
-      </div>
-      <div class="job-section"><h4>Who You Are</h4>
-        <ul>
-          <li>Organized, thorough, and proactive — you catch problems before they become fires</li>
-          <li>Comfortable navigating legal frameworks without necessarily being a licensed attorney (JD is a plus)</li>
-          <li>Strong written communicator who can translate legalese into plain English</li>
-          <li>You thrive in lean environments where wearing many hats is the norm</li>
-          <li>You care about building something real — not just running a tight process</li>
-        </ul>
-      </div>
-      <div class="job-apply"><strong>How to Apply:</strong> Send an email to <a href="/cdn-cgi/l/email-protection#e088858c8c8fa0848199938c8996898e87ce838f8d"><span class="__cf_email__" data-cfemail="721a171e1e1d3216130b011e1b041b1c155c111d1f">[email&#160;protected]</span></a> with your resume and a short note on why this role fits you. We look for clarity, humility, and a good sense of what matters.</div>
+      <div class="js"><h4>The Role</h4><p>Build the legal, financial, and administrative infrastructure that lets a small company move fast without breaking things. You'll be our first operational hire.</p></div>
+      <div class="js"><h4>What You'll Do</h4><ul>
+        <li>Risk auditing — review product, policies, and user flows for potential liabilities</li>
+        <li>Draft and maintain legal templates — ToS, Privacy Policy, NDAs, offer letters</li>
+        <li>Lead IP strategy — trademark, copyright, open-source license evaluation</li>
+        <li>Build investor-ready due diligence folder — cap table, formation docs, contracts</li>
+        <li>Draft licensing, affiliate, and revenue share agreements</li>
+        <li>Create internal policies — data security, remote work, reimbursement</li>
+        <li>Monitor regulatory shifts — AI/data law, App Store regulations, tax compliance</li>
+        <li>Build customer service and legal escalation playbooks</li>
+        <li>Ensure contractor compliance — 1099s, SOWs, international freelancers</li>
+        <li>Support sales, invoicing, and financial reporting</li>
+      </ul></div>
+      <div class="ja"><strong>How to Apply:</strong> Email <a href="mailto:hello@days.health">hello@days.health</a> with your resume and a short note on why this role fits you.</div>
     </div>
 
-    <!-- PRODUCT MANAGER -->
-    <div class="job-card">
-      <div class="job-header">
-        <div class="job-title-wrap">
-          <h3>Product Manager — Content, Copy & Community</h3>
-          <div class="job-meta"><span class="job-tag">Hybrid</span><span class="job-tag">Full-Time</span><span class="job-tag">Remote-First</span></div>
-        </div>
-        <span class="job-comp">$70K–$80K</span>
+    <div class="jc">
+      <div class="jh">
+        <div><h3>Product Manager — Content, Copy &amp; Community</h3><div class="jm"><span class="jt">Hybrid</span><span class="jt">Full-Time</span><span class="jt">Remote-First</span></div></div>
+        <span class="jp">$70K–$80K</span>
       </div>
-      <div class="job-section"><h4>About Days</h4><p>Days is a focused, quiet app for people who want to live well — part journal, part scheduler, part something else that doesn't quite exist yet. We design with intention, operate privately, and build for people, not clicks. We're early-stage, and your voice can shape everything from product roadmap to brand tone.</p></div>
-      <div class="job-section"><h4>The Role</h4><p>We're hiring a Product Manager with a strong sense for communication, calm, and consistency. Your role will center on how we show up in the world — through copy, messaging, and research-backed tools that meet people where they are. You'll create guided exercises, meditations, and reflective prompts rooted in evidence-based practices, manage advertising strategy, and collaborate directly with our Lead UX/Tech to bring it all to life.</p></div>
-      <div class="job-section"><h4>What You'll Do</h4>
-        <ul>
-          <li>Own the content and experience layer of Days — from copywriting to meditative flows</li>
-          <li>Develop and refine routines and exercises for reflection, focus, wellness, and discipline</li>
-          <li>Conduct lightweight research to ensure content is grounded in sound principles</li>
-          <li>Write all public-facing marketing copy — landing pages, ads, emails, and more</li>
-          <li>Plan and run basic advertising experiments (search, social, App Store, etc.)</li>
-          <li>Work side-by-side with the UX Lead to implement new features and polish interactions</li>
-          <li>Keep the product and message aligned with a clear, quiet mission</li>
-        </ul>
-      </div>
-      <div class="job-section"><h4>Who You Are</h4>
-        <ul>
-          <li>A calm, clear communicator who can lead with language</li>
-          <li>Familiar with mindfulness, productivity, and wellness frameworks (and know what's fluff)</li>
-          <li>Can write crisp, meaningful copy without sounding like a startup trying to be clever</li>
-          <li>Detail-oriented but not micromanaging — able to define success and move toward it steadily</li>
-          <li>You prefer rhythm over rush; integrity over flash</li>
-        </ul>
-      </div>
-      <div class="job-section"><h4>Bonus Points</h4>
-        <ul>
-          <li>You've designed or facilitated meditations, journaling routines, or wellness content</li>
-          <li>You've worked with mental health professionals or studied behavioral science</li>
-          <li>You can run a Google Ads or Meta campaign and read the results</li>
-          <li>Familiar with Notion, Figma, Framer, or Swift</li>
-          <li>You've worked in a small team or faith-aligned organization where purpose matters more than prestige</li>
-        </ul>
-      </div>
-      <div class="job-apply"><strong>How to Apply:</strong> Email <a href="/cdn-cgi/l/email-protection#89e1ece5e5e6c9ede8f0fae5e0ffe0e7eea7eae6e4"><span class="__cf_email__" data-cfemail="026a676e6e6d4266637b716e6b746b6c652c616d6f">[email&#160;protected]</span></a> with a short note on why you're interested, 1–2 links or samples of something you've written or led, and your resume or CV (PDF or LinkedIn is fine).</div>
+      <div class="js"><h4>The Role</h4><p>Own how Days shows up in the world — through copy, messaging, and research-backed wellness tools. Create guided exercises, meditations, and reflective prompts, manage advertising, and collaborate with our Lead UX/Tech.</p></div>
+      <div class="js"><h4>What You'll Do</h4><ul>
+        <li>Own the content and experience layer — from copywriting to meditative flows</li>
+        <li>Develop routines and exercises for reflection, focus, wellness, and discipline</li>
+        <li>Write all public-facing marketing copy — landing pages, ads, emails</li>
+        <li>Plan and run advertising experiments (search, social, App Store)</li>
+        <li>Collaborate with UX Lead to implement features and polish interactions</li>
+      </ul></div>
+      <div class="js"><h4>Who You Are</h4><ul>
+        <li>A calm, clear communicator who leads with language</li>
+        <li>Familiar with mindfulness and wellness frameworks — and knows what's fluff</li>
+        <li>Writes crisp, meaningful copy without sounding like a startup trying to be clever</li>
+        <li>Prefers rhythm over rush; integrity over flash</li>
+      </ul></div>
+      <div class="ja"><strong>How to Apply:</strong> Email <a href="mailto:hello@days.health">hello@days.health</a> with a short note, 1–2 writing samples, and your resume.</div>
     </div>
 
-    <!-- LEAD UX -->
-    <div class="job-card">
-      <div class="job-header">
-        <div class="job-title-wrap">
-          <h3>Lead UX Designer / Technology Manager</h3>
-          <div class="job-meta"><span class="job-tag">Hybrid</span><span class="job-tag">Full-Time</span><span class="job-tag">Remote-Friendly</span></div>
-        </div>
-        <span class="job-comp">$60K–$80K</span>
+    <div class="jc">
+      <div class="jh">
+        <div><h3>Lead UX Designer / Technology Manager</h3><div class="jm"><span class="jt">Hybrid</span><span class="jt">Full-Time</span><span class="jt">Remote-Friendly</span></div></div>
+        <span class="jp">$60K–$80K</span>
       </div>
-      <div class="job-section"><h4>About Days</h4><p>Days is a growing personal wellness and scheduling platform with a simple mission: to help people make the most of their time. We're early-stage, lean, and privacy-forward — building with focus, intention, and zero interest in bloated bureaucracy or surveillance capitalism.</p></div>
-      <div class="job-section"><h4>The Role</h4><p>We're looking for a hybrid Lead UX Designer / Technology Manager to take the reins of our app and website experience. You'll shape how Days feels — through design, implementation, and motion. You'll work closely with the Product Manager to implement intuitive interfaces, subtle animations, and seamless copy across iOS and web.</p></div>
-      <div class="job-section"><h4>What You'll Do</h4>
-        <ul>
-          <li>Own the end-to-end UX of the Days app (iOS-focused, Swift-based)</li>
-          <li>Improve or build out our web presence using modern frameworks (React, Astro, or similar)</li>
-          <li>Collaborate with the Product Manager to implement UI changes, update copy, and iterate fast</li>
-          <li>Design and implement animations and microinteractions that make Days delightful</li>
-          <li>Set and refine design standards aligned with our minimalist, privacy-focused brand</li>
-          <li>Solve technical issues or rethink user flows — whatever's needed to ship great features</li>
-        </ul>
-      </div>
-      <div class="job-section"><h4>Who You Are</h4>
-        <ul>
-          <li>A generalist with a strong eye for clean design and good UX</li>
-          <li>Working knowledge of Swift and UIKit/SwiftUI</li>
-          <li>Can build or upgrade websites — clean, fast, and responsive (Tailwind, React, or Astro a plus)</li>
-          <li>Comfortable with animations — Lottie, CSS keyframes, UIKit transitions, etc.</li>
-          <li>Not afraid to get your hands dirty in code and then talk strategy in the same meeting</li>
-          <li>You believe in good design, simple copy, and the power of doing one thing well</li>
-        </ul>
-      </div>
-      <div class="job-section"><h4>Nice-to-Haves</h4>
-        <ul>
-          <li>Experience shipping or maintaining a live app</li>
-          <li>Comfortable working without a design system (and willing to build one)</li>
-          <li>Familiarity with privacy-centered design principles</li>
-        </ul>
-      </div>
-      <div class="job-apply"><strong>How to Apply:</strong> Send a quick intro to <a href="/cdn-cgi/l/email-protection#056d6069696a4561647c76696c736c6b622b666a68"><span class="__cf_email__" data-cfemail="92faf7fefefdd2f6f3ebe1fefbe4fbfcf5bcf1fdff">[email&#160;protected]</span></a> with a portfolio or 1–2 links to work you're proud of, a few sentences about why you're into this role, and your resume (PDF or LinkedIn is fine). We don't care where you went to school — we care if you can design, build, and think clearly, and if you actually care about making something great.</div>
+      <div class="js"><h4>The Role</h4><p>Take the reins of our app and website experience. Shape how Days feels through design, implementation, and motion — working closely with the Product Manager across iOS and web.</p></div>
+      <div class="js"><h4>What You'll Do</h4><ul>
+        <li>Own end-to-end UX of the Days iOS app (Swift/SwiftUI)</li>
+        <li>Build or improve web presence using React, Astro, or similar</li>
+        <li>Design and implement animations and microinteractions</li>
+        <li>Set design standards aligned with our minimalist, privacy-focused brand</li>
+      </ul></div>
+      <div class="js"><h4>Who You Are</h4><ul>
+        <li>Generalist with a strong eye for clean design and good UX</li>
+        <li>Working knowledge of Swift and UIKit/SwiftUI</li>
+        <li>Can build fast, responsive websites (Tailwind, React, or Astro a plus)</li>
+        <li>Believes in good design, simple copy, and doing one thing well</li>
+      </ul></div>
+      <div class="ja"><strong>How to Apply:</strong> Send a portfolio or 1–2 links to work you're proud of to <a href="mailto:hello@days.health">hello@days.health</a> with your resume.</div>
     </div>
 
   </div>
-  <footer><p>© 2026 Days LLC. All rights reserved.</p><div class="footer-links"><a href="#" onclick="SD('privacy')">Privacy Policy</a><a href="#" onclick="SD('contact')">Contact</a></div></footer>
+  <footer><p>© 2026 Days LLC. All rights reserved.</p><div class="fl"><a href="#" onclick="go('privacy');return false">Privacy Policy</a><a href="#" onclick="go('contact');return false">Contact</a></div></footer>
 </section>
 
-<!-- ══ CONTACT ══ -->
-<section id="contact" class="page">
-  <div class="inner-wrap">
-    <p class="page-eyebrow">Reach out</p>
-    <h2 class="page-title">Get in<br><strong>touch.</strong></h2>
-    <p class="page-lead">Questions, feedback, press — we read everything and respond to most of it.</p>
-    <hr class="rule">
-    <div class="card"><p class="contact-label">Contact</p><p class="contact-value">John — Days LLC, Admin</p></div>
-    <div class="card"><p class="contact-label">Phone</p><p class="contact-value"><a href="tel:+15056603397">660-3397</a></p></div>
-    <div class="card"><p class="contact-label">Address</p><p class="contact-value">1209 Mountain Road Pl NE, Ste N<br>Albuquerque, NM 87110</p></div>
-    <div class="card"><p class="contact-label">Email</p><p class="contact-value"><a href="/cdn-cgi/l/email-protection#97fff2fbfbf8d7f3f6eee4fbfee1fef9f0b9f4f8fa"><span class="__cf_email__" data-cfemail="761e131a1a193612170f051a1f001f18115815191b">[email&#160;protected]</span></a></p></div>
+<section id="contact" class="pg">
+  <div class="iw">
+    <p class="ey">Reach out</p>
+    <h2 class="pt">Get in<br><strong>touch.</strong></h2>
+    <p class="pl">Questions, feedback, press — we read everything.</p>
+    <hr class="rl">
+    <div class="cd"><p class="cl">Contact</p><p class="cv">John — Days LLC, Admin</p></div>
+    <div class="cd"><p class="cl">Phone</p><p class="cv"><a href="tel:+15056603397">660-3397</a></p></div>
+    <div class="cd"><p class="cl">Address</p><p class="cv">1209 Mountain Road Pl NE, Ste N<br>Albuquerque, NM 87110</p></div>
+    <div class="cd"><p class="cl">Email</p><p class="cv"><a href="mailto:support@days.health">support@days.health</a></p></div>
   </div>
-  <footer><p>© 2026 Days LLC. All rights reserved.</p><div class="footer-links"><a href="#" onclick="SD('privacy')">Privacy Policy</a><a href="#" onclick="SD('jobs')">Jobs</a></div></footer>
+  <footer><p>© 2026 Days LLC. All rights reserved.</p><div class="fl"><a href="#" onclick="go('privacy');return false">Privacy Policy</a><a href="#" onclick="go('jobs');return false">Jobs</a></div></footer>
 </section>
 
-<!-- ══ TERMS ══ -->
-<section id="terms" class="page">
-  <div class="inner-wrap">
-    <p class="page-eyebrow">Legal</p>
-    <h2 class="page-title">Terms of<br><strong>Service.</strong></h2>
-    <p class="page-lead">Days LLC — Last updated: 2025</p>
-    <hr class="rule">
-    <div class="prose">
-      <p>These Terms govern your access to and use of the Days mobile application and related services ("Service") provided by Days LLC. By using the Service, you agree to be bound by these Terms.</p>
-      <h3>Eligibility</h3>
-      <p>You must be 13 years or older to use the Services. If you are under 18, a parent or guardian must review and agree to these Terms. Days is not intended for unsupervised use by children under 13.</p>
-      <h3>Account Registration</h3>
-      <p>Accounts are optional. You may use the Service without registering; a pseudonymous ID is assigned. To create a registered account, you must provide a valid name and email. You are responsible for all activity under your credentials.</p>
-      <h3>Data Collection &amp; Storage</h3>
-      <p>We collect name and email (registered accounts only), birthdate and location (for personalization), and journal entries. Journal entries are encrypted at rest and in transit. We do not sell your data. See our Privacy Policy for full details.</p>
-      <h3>Subscription &amp; Payment</h3>
-      <p>The Service offers paid subscription plans (monthly and annual). Subscriptions auto-renew unless canceled at least 24 hours before renewal. Payments are processed via Apple App Store or Google Play. All sales are final.</p>
-      <h3>Intellectual Property</h3>
-      <p>All content in the Service is owned or licensed by us. We grant you a personal, non-exclusive, non-transferable license to use the Service for its intended purposes. You may not copy, reverse-engineer, or remove proprietary notices.</p>
-      <h3>User Conduct</h3>
-      <p>You agree not to use the Service for unlawful purposes, interfere with its operation, impersonate any person, or submit harassing or defamatory content. We may suspend or terminate access for violations.</p>
-      <h3>Health &amp; Wellness Disclaimer</h3>
-      <p>The Service provides wellness content for informational purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment. Consult a qualified professional if you have health concerns.</p>
-      <h3>Limitation of Liability</h3>
-      <p>To the maximum extent permitted by law, we disclaim all warranties and are not liable for indirect, incidental, or consequential damages. Our total liability shall not exceed the amount you paid us in the prior 12 months (or $50 if you are a free user).</p>
-      <h3>Indemnification</h3>
-      <p>You agree to indemnify and hold us harmless from any claims, damages, or expenses arising from your breach of these Terms or use of the Service.</p>
-      <h3>Termination</h3>
-      <p>We may suspend or terminate your access at any time, with or without cause. Upon termination, your right to use the Service immediately ceases.</p>
-      <h3>Changes to Terms</h3>
-      <p>We reserve the right to modify these Terms at any time. We will notify you of material changes via the app or email. Continued use constitutes acceptance.</p>
-      <h3>Governing Law</h3>
-      <p>These Terms are governed by the laws of the State of New Mexico. Disputes will be subject to the jurisdiction of courts in Albuquerque, NM.</p>
-      <h3>Contact</h3>
-      <p>For questions about these Terms: <a href="/cdn-cgi/l/email-protection#d9aaaca9a9b6abad99bdb8a0aaf7b1bcb8b5adb1"><span class="__cf_email__" data-cfemail="e695939696899492a682879f95c88e83878a928e">[email&#160;protected]</span></a> — Days LLC, 1209 Mountain Road Pl NE, Ste N, Albuquerque, NM 87110.</p>
-    </div>
-  </div>
-  <footer><p>© 2026 Days LLC. All rights reserved.</p><div class="footer-links"><a href="#" onclick="SD('privacy')">Privacy Policy</a><a href="#" onclick="SD('contact')">Contact</a></div></footer>
-</section>
-
-<!-- ══ PRIVACY ══ -->
-<section id="privacy" class="page">
-  <div class="inner-wrap">
-    <p class="page-eyebrow">Legal</p>
-    <h2 class="page-title">Privacy<br><strong>Policy.</strong></h2>
-    <p class="page-lead">Days LLC — Last updated: February 2026</p>
-    <hr class="rule">
-    <div class="prose">
-      <p>Days is designed to protect your information and enable you to choose what to share. We collect only what's needed to support your wellness journey and never sell your information.</p>
-      <p>This Privacy Policy describes how Days ("we", "us", or "our") collects, uses, and protects your information when you use our app, website, and related services.</p>
-
+<section id="privacy" class="pg">
+  <div class="iw">
+    <p class="ey">Legal</p>
+    <h2 class="pt">Privacy<br><strong>Policy.</strong></h2>
+    <p class="pl">Days LLC — Last updated: February 2026</p>
+    <hr class="rl">
+    <div class="pr">
+      <p>Days is designed to protect your information and enable you to choose what to share. We collect only what is needed to support your wellness journey and never sell your information.</p>
       <h3>What We Collect</h3>
-      <p><strong>Account Information:</strong> Name (optional or pseudonym), email address, birthday, and location (city/region level for timezone-based reminders).</p>
-      <p><strong>Wellness Activity:</strong> Journal entries, meditation usage, exercise and mood check-ins, and in-app purchase or subscription status.</p>
-      <p><strong>Device & Usage Data:</strong> App version, device type, OS, crash logs, and anonymous analytics (only with consent where applicable).</p>
-
+      <p><strong>Account Information:</strong> Name (optional), email address, birthday, and location (city/region for timezone-based reminders).</p>
+      <p><strong>Wellness Activity:</strong> Journal entries, meditation usage, mood check-ins, and subscription status.</p>
+      <p><strong>Device and Usage Data:</strong> App version, device type, OS, crash logs, and anonymous analytics (with consent).</p>
       <h3>How We Use Your Data</h3>
-      <p>We use your data to personalize your wellness content, deliver reminders, improve app performance, provide support, and offer subscription features. We do not use your data to profile you for advertising, nor do we sell or share it with third-party marketers.</p>
-
+      <p>We use your data to personalize wellness content, deliver reminders, improve performance, provide support, and offer subscription features. We do not profile you for advertising or sell your data.</p>
       <h3>Storage and Security</h3>
-      <p>Your data is stored using secure, encrypted infrastructure. Journals and mood logs are accessible only to you and your authorized devices. We limit internal access to your data to only those who need it to maintain the service.</p>
-
+      <p>Your data is stored using secure, encrypted infrastructure. Journals are accessible only to you and your authorized devices.</p>
       <h3>Data Sharing</h3>
-      <p>We do not sell your data. We only share information with trusted infrastructure partners, when legally required, to prevent harm or fraud, or if you explicitly consent.</p>
-
+      <p>We do not sell your data. We only share information with trusted infrastructure partners, when legally required, to prevent harm, or with your explicit consent.</p>
       <h3>Managing Your Data</h3>
-      <p>You can view and update your account information, download a copy of your data, or delete your account at any time. To delete your data, email <a href="/cdn-cgi/l/email-protection#a3d0d6d3d3ccd1d7e3c7c2dad08dc0c2d1c6"><span class="__cf_email__" data-cfemail="780b0d0808170a0c381c19010b561b190a1d">[email&#160;protected]</span></a>.</p>
-
+      <p>You can view, update, or delete your account at any time. To delete your data, email <a href="mailto:support@days.care">support@days.care</a>.</p>
       <h3>Children's Privacy</h3>
-      <p>We do not knowingly collect personal data from children under 13 without verified parental consent. If you're a parent or guardian with concerns, contact <a href="/cdn-cgi/l/email-protection#f8888a918e999b81b89c99818bd69b998a9d"><span class="__cf_email__" data-cfemail="3747455e4156544e7753564e441954564552">[email&#160;protected]</span></a>.</p>
-
+      <p>We do not knowingly collect data from children under 13 without parental consent. Contact <a href="mailto:privacy@days.care">privacy@days.care</a> with concerns.</p>
       <h3>Your Rights</h3>
-      <p>Depending on where you live (California, EU/EEA, etc.), you may have the right to access, correct, delete, or export your data. Contact <a href="/cdn-cgi/l/email-protection#7e0e0c17081f1d073e1a1f070d501d1f0c1b"><span class="__cf_email__" data-cfemail="7e0e0c17081f1d073e1a1f070d501d1f0c1b">[email&#160;protected]</span></a> to exercise these rights.</p>
-
-      <h3>Policy Updates</h3>
-      <p>We may update this Privacy Policy from time to time and will notify you of significant changes via in-app notice or email.</p>
-
+      <p>Depending on your location, you may have the right to access, correct, delete, or export your data. Contact <a href="mailto:privacy@days.care">privacy@days.care</a>.</p>
       <h3>Contact Us</h3>
-      <p>Days Team — <a href="/cdn-cgi/l/email-protection#9cefe9ececf3eee8dcf8fde5efb2f4f9fdf0e8f4"><span class="__cf_email__" data-cfemail="7f0c0a0f0f100d0b3f1b1e060c51171a1e130b17">[email&#160;protected]</span></a> &nbsp;·&nbsp; <a href="https://days.health">days.health</a><br>Days LLC, 1209 Mountain Road Pl NE, Ste N, Albuquerque, NM 87110</p>
+      <p>Days Team — <a href="mailto:support@days.health">support@days.health</a><br>Days LLC, 1209 Mountain Road Pl NE, Ste N, Albuquerque, NM 87110</p>
     </div>
   </div>
-  <footer><p>© 2026 Days LLC. All rights reserved.</p><div class="footer-links"><a href="#" onclick="SD('terms')">Terms of Service</a><a href="#" onclick="SD('contact')">Contact</a></div></footer>
+  <footer><p>© 2026 Days LLC. All rights reserved.</p><div class="fl"><a href="#" onclick="go('terms');return false">Terms of Service</a><a href="#" onclick="go('contact');return false">Contact</a></div></footer>
 </section>
 
-<!-- TERMS -->
-<section id="terms" class="page">
-  <div class="inner-wrap">
-    <p class="page-eyebrow">Legal</p>
-    <h2 class="page-title">Terms of<br><strong>Service.</strong></h2>
-    <p class="page-lead">Days LLC — Last updated: June 2025</p>
-    <hr class="rule">
-    <div class="prose">
-      <p>These Terms govern your access to and use of the Days mobile application and related services provided by Days LLC. By downloading, installing, or using the Service, you agree to be bound by these Terms.</p>
-
+<section id="terms" class="pg">
+  <div class="iw">
+    <p class="ey">Legal</p>
+    <h2 class="pt">Terms of<br><strong>Service.</strong></h2>
+    <p class="pl">Days LLC — Last updated: June 2025</p>
+    <hr class="rl">
+    <div class="pr">
+      <p>These Terms govern your access to and use of Days. By downloading, installing, or using the Service, you agree to be bound by these Terms.</p>
       <h3>Eligibility</h3>
-      <p>You must be 13 years or older to use the Services. If you are under 18, a parent or guardian must review and agree to these Terms with you. Days is not intended for unsupervised use by children under 13.</p>
-
+      <p>You must be 13 or older to use the Services. If under 18, a parent or guardian must agree to these Terms with you.</p>
       <h3>Account Registration</h3>
-      <p>Accounts are optional. You may use the Service without registering; a pseudonymous ID is assigned in that case. To create a registered account, you must provide a valid name and email address. You remain responsible for all activity under your account credentials.</p>
-
-      <h3>Data Collection & Storage</h3>
-      <p>We collect name and email (registered accounts only), birthdate and location (for personalization), and journal entries. Journal entries are encrypted at rest and in transit. We do not sell your data. Full details are in our <a href="#" onclick="SD('privacy')">Privacy Policy</a>.</p>
-
-      <h3>Subscription & Payment</h3>
-      <p>The Service offers paid subscription plans (monthly and annual). Subscriptions auto-renew unless canceled at least 24 hours before renewal. Payments are processed via the Apple App Store or Google Play. All sales are final — no refunds for partial subscription periods.</p>
-
+      <p>Accounts are optional. You may use the Service without registering — a pseudonymous ID is assigned. Registered accounts require a valid name and email. You are responsible for all activity under your credentials.</p>
+      <h3>Data Collection and Storage</h3>
+      <p>We collect name, email, birthdate, location, and journal entries. All data is encrypted at rest and in transit. We do not sell your data. See our <a href="#" onclick="go('privacy');return false">Privacy Policy</a> for full details.</p>
+      <h3>Subscription and Payment</h3>
+      <p>Paid plans (monthly and annual) auto-renew unless canceled 24 hours before renewal. Payments are processed via Apple App Store or Google Play. All sales are final.</p>
       <h3>Intellectual Property</h3>
-      <p>All materials in the Service are owned or licensed by us and protected by copyright and trademark law. We grant you a personal, non-exclusive, non-transferable license to use the Service for its intended purposes. You may not copy, reverse-engineer, or remove proprietary notices from our content.</p>
-
+      <p>All materials are owned or licensed by us. We grant you a personal, non-exclusive license to use the Service for its intended purposes. You may not copy, reverse-engineer, or remove proprietary notices.</p>
       <h3>User Conduct</h3>
-      <p>You agree not to use the Service for unlawful purposes, interfere with the Service's operation, impersonate any person or entity, or submit harassing or defamatory content. We may suspend or terminate your access for violations.</p>
-
-      <h3>Health & Wellness Disclaimer</h3>
-      <p>The Service provides wellness content based on published studies. It is not a substitute for professional medical advice, diagnosis, or treatment. If you have health concerns, consult a qualified professional.</p>
-
+      <p>You agree not to use the Service for unlawful purposes, interfere with its operation, impersonate others, or submit harassing content. We may terminate access for violations.</p>
+      <h3>Health Disclaimer</h3>
+      <p>Days provides wellness content based on published studies. It is not a substitute for professional medical advice. Consult a qualified professional if you have health concerns.</p>
       <h3>Limitation of Liability</h3>
-      <p>To the maximum extent permitted by law, we disclaim all warranties, express or implied. We are not liable for indirect, incidental, or consequential damages. Our total liability shall not exceed the amount you paid us in the prior 12 months (or $50 for free users).</p>
-
-      <h3>Indemnification</h3>
-      <p>You agree to indemnify and hold us harmless from any claims, damages, or expenses arising from your breach of these Terms or your use of the Service.</p>
-
-      <h3>Termination</h3>
-      <p>We may suspend or terminate your access at any time, with or without cause. Upon termination, your right to use the Service immediately ceases.</p>
-
-      <h3>Changes to Terms</h3>
-      <p>We reserve the right to modify these Terms at any time and will notify you of material changes via the app or email. Continued use after changes constitutes acceptance.</p>
-
+      <p>We disclaim all warranties to the maximum extent permitted by law. Our total liability shall not exceed the amount you paid us in the prior 12 months (or $50 for free users).</p>
       <h3>Governing Law</h3>
-      <p>These Terms are governed by the laws of the State of New Mexico. Any dispute will be subject to the jurisdiction of the state and federal courts located in Albuquerque, New Mexico.</p>
-
+      <p>These Terms are governed by the laws of New Mexico. Disputes fall under the jurisdiction of courts in Albuquerque, New Mexico.</p>
       <h3>Contact</h3>
-      <p>For questions about these Terms, contact us at <a href="/cdn-cgi/l/email-protection#17646267677865635773766e64397f72767b637f"><span class="__cf_email__" data-cfemail="6c1f191c1c031e182c080d151f4204090d001804">[email&#160;protected]</span></a>.</p>
+      <p>Questions? Email <a href="mailto:support@days.health">support@days.health</a>.</p>
     </div>
   </div>
-  <footer><p>© 2026 Days LLC. All rights reserved.</p><div class="footer-links"><a href="#" onclick="SD('privacy')">Privacy Policy</a><a href="#" onclick="SD('contact')">Contact</a></div></footer>
+  <footer><p>© 2026 Days LLC. All rights reserved.</p><div class="fl"><a href="#" onclick="go('privacy');return false">Privacy Policy</a><a href="#" onclick="go('contact');return false">Contact</a></div></footer>
 </section>
 
-function SD(id){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});document.getElementById(id).classList.add('active');window.scrollTo(0,0);return false;}
-function TG(){document.getElementById('HB').classList.toggle('open');document.getElementById('DR').classList.toggle('open');document.getElementById('OV').classList.toggle('open');}
-function CL(){document.getElementById('HB').classList.remove('open');document.getElementById('DR').classList.remove('open');document.getElementById('OV').classList.remove('open');}
-function HN(){var e=document.getElementById('emailInput').value;var m=document.getElementById('notifyMsg');if(e&&e.indexOf('@')>-1){m.textContent='You are on the list!';m.style.color='#fff';}else{m.textContent='Please enter a valid email.';m.style.color='rgba(255,200,200,0.9)';}}
+<script>
+function go(id){
+  var pages = document.querySelectorAll('.pg');
+  for(var i=0;i<pages.length;i++){pages[i].classList.remove('on');}
+  document.getElementById(id).classList.add('on');
+  window.scrollTo(0,0);
+}
+function tog(){
+  document.getElementById('HB').classList.toggle('open');
+  document.getElementById('DR').classList.toggle('open');
+  document.getElementById('OV').classList.toggle('open');
+}
+function cls(){
+  document.getElementById('HB').classList.remove('open');
+  document.getElementById('DR').classList.remove('open');
+  document.getElementById('OV').classList.remove('open');
+}
+function notify(){
+  var e=document.getElementById('EI').value;
+  var m=document.getElementById('NM');
+  if(e&&e.indexOf('@')>-1){
+    m.textContent='You are on the list! We will reach out when Days launches.';
+    m.style.color='#fff';
+    document.getElementById('EI').value='';
+  }else{
+    m.textContent='Please enter a valid email address.';
+    m.style.color='rgba(255,200,200,0.9)';
+  }
+}
+</script>
+</body>
+</html>
